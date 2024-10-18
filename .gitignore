@@ -9,7 +9,11 @@
 /coverage
 
 # production
-/build
+node_modules/
+.env
+build/
+youtubeApi.js
+firebaseConfig.js
 
 # misc
 .DS_Store
