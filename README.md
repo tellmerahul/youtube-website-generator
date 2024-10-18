@@ -1,4 +1,4 @@
-# TransformYT
+# youtube-website-generator
 
 ## Setup
 
