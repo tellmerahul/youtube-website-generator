@@ -17,6 +17,7 @@ const LandingPage = () => {
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
   const [signupForm, setSignupForm] = useState({ name: '', email: '', password: '' });
   const [user, setUser] = useState(null);
+  const [previewMode, setPreviewMode] = useState('desktop');
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -145,7 +146,6 @@ const LandingPage = () => {
                 <button onClick={() => { setIsSignupModalOpen(true); setIsMenuOpen(false); }} className="block w-full text-left py-2 px-4 text-gray-800 hover:text-red-600 transition-colors duration-300">Sign Up</button>
               </>
             )}
-            
           </div>
         )}
       </header>
@@ -305,36 +305,238 @@ const LandingPage = () => {
             </div>
           </div>
         </section>
+         
+        {/* Loading Indicator */}
+      {isLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-red-600 mx-auto"></div>
+            <p className="text-center mt-4 text-lg">Generating your website...</p>
+          </div>
+        </div>
+      )}
 
-        {generatedWebsite && (
-          <section className="py-16">
-            <div className="container mx-auto px-4">
-              <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">Your Generated Website</h2>
-              <div className="bg-white bg-opacity-50 backdrop-filter backdrop-blur-lg p-4 rounded-lg shadow-lg">
+
+       
+      {/* Generated Website Modal */}
+      {generatedWebsite && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg w-11/12 h-5/6 relative">
+            <button 
+              onClick={() => setGeneratedWebsite(null)} 
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            >
+              <X size={20} />
+            </button>
+            
+            <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">Your Generated Website</h2>
+            
+            {/* Preview Controls */}
+            <div className="flex justify-center mb-4 space-x-4">
+              <button
+                onClick={() => setPreviewMode('desktop')}
+                className={`px-4 py-2 rounded ${
+                  previewMode === 'desktop' ? 'bg-red-600 text-white' : 'bg-gray-200'
+                }`}
+              >
+                Desktop
+              </button>
+              <button
+                onClick={() => setPreviewMode('tablet')}
+                className={`px-4 py-2 rounded ${
+                  previewMode === 'tablet' ? 'bg-red-600 text-white' : 'bg-gray-200'
+                }`}
+              >
+                Tablet
+              </button>
+              <button
+                onClick={() => setPreviewMode('mobile')}
+                className={`px-4 py-2 rounded ${
+                  previewMode === 'mobile' ? 'bg-red-600 text-white' : 'bg-gray-200'
+                }`}
+              >
+                Mobile
+              </button>
+            </div>
+
+            {/* Preview Container */}
+            <div className="h-[calc(100%-160px)] overflow-auto bg-gray-100 rounded-lg p-4">
+              <div className={`
+                transition-all duration-300 h-full bg-white mx-auto shadow-lg
+                ${previewMode === 'desktop' ? 'w-full' : ''}
+                ${previewMode === 'tablet' ? 'w-[768px]' : ''}
+                ${previewMode === 'mobile' ? 'w-[375px]' : ''}
+              `}>
                 <iframe
                   srcDoc={generatedWebsite}
                   title="Generated Website Preview"
-                  className="w-full h-96 border-none rounded-lg"
+                  className="w-full h-full border-none rounded-lg"
                 />
-                <button
-                  onClick={() => {
-                    const blob = new Blob([generatedWebsite], { type: 'text/html' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'my-youtube-website.html';
-                    a.click();
-                  }}
-                  className="mt-4 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-300 transform hover:scale-105"
-                >
-                  Download HTML
-                </button>
               </div>
             </div>
-          </section>
-        )}
-      </main>
 
+            {/* Action Buttons */}
+            <div className="flex justify-center mt-4 space-x-4">
+              <button
+                onClick={() => {
+                  const blob = new Blob([generatedWebsite], { type: 'text/html' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = 'my-youtube-website.html';
+                  a.click();
+                }}
+                className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors duration-300"
+              >
+                Download HTML
+              </button>
+              <button
+                onClick={() => {
+                  const newWindow = window.open();
+                  newWindow.document.write(generatedWebsite);
+                }}
+                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300"
+              >
+                Open in New Tab
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      </main>
+      {/* Login Modal */}
+{isLoginModalOpen && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full relative">
+      <button 
+        onClick={() => setIsLoginModalOpen(false)} 
+        className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+      >
+        <X size={20} />
+      </button>
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">Login</h2>
+      <form onSubmit={handleLogin} className="space-y-4">
+        <div>
+          <input
+            type="email"
+            placeholder="Email"
+            value={loginForm.email}
+            onChange={(e) => setLoginForm({...loginForm, email: e.target.value})}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+            required
+          />
+        </div>
+        <div>
+          <input
+            type="password"
+            placeholder="Password"
+            value={loginForm.password}
+            onChange={(e) => setLoginForm({...loginForm, password: e.target.value})}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+            required
+          />
+        </div>
+        <button
+          type="submit"
+          className="w-full bg-red-600 text-white py-2 rounded-lg font-bold hover:bg-red-700 transition-colors duration-300"
+        >
+          Login
+        </button>
+      </form>
+      <button
+        onClick={handleGoogleLogin}
+        className="w-full mt-4 bg-white border border-gray-300 text-gray-700 py-2 rounded-lg font-bold hover:bg-gray-50 transition-colors duration-300 flex items-center justify-center"
+      >
+        <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5 mr-2" />
+        Continue with Google
+      </button>
+      <p className="mt-4 text-center text-gray-600">
+        Don't have an account?{' '}
+        <button
+          onClick={() => {
+            setIsLoginModalOpen(false);
+            setIsSignupModalOpen(true);
+          }}
+          className="text-red-600 hover:text-red-700 font-semibold"
+        >
+          Sign up
+        </button>
+      </p>
+    </div>
+  </div>
+)}
+
+{/* Signup Modal */}
+{isSignupModalOpen && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full relative">
+      <button 
+        onClick={() => setIsSignupModalOpen(false)} 
+        className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+      >
+        <X size={20} />
+      </button>
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">Create Account</h2>
+      <form onSubmit={handleSignup} className="space-y-4">
+        <div>
+          <input
+            type="text"
+            placeholder="Full Name"
+            value={signupForm.name}
+            onChange={(e) => setSignupForm({...signupForm, name: e.target.value})}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+            required
+          />
+        </div>
+        <div>
+          <input
+            type="email"
+            placeholder="Email"
+            value={signupForm.email}
+            onChange={(e) => setSignupForm({...signupForm, email: e.target.value})}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+            required
+          />
+        </div>
+        <div>
+          <input
+            type="password"
+            placeholder="Password"
+            value={signupForm.password}
+            onChange={(e) => setSignupForm({...signupForm, password: e.target.value})}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+            required
+          />
+        </div>
+        <button
+          type="submit"
+          className="w-full bg-red-600 text-white py-2 rounded-lg font-bold hover:bg-red-700 transition-colors duration-300"
+        >
+          Sign Up
+        </button>
+      </form>
+      <button
+        onClick={handleGoogleLogin}
+        className="w-full mt-4 bg-white border border-gray-300 text-gray-700 py-2 rounded-lg font-bold hover:bg-gray-50 transition-colors duration-300 flex items-center justify-center"
+      >
+        <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5 mr-2" />
+        Sign up with Google
+      </button>
+      <p className="mt-4 text-center text-gray-600">
+        Already have an account?{' '}
+        <button
+          onClick={() => {
+            setIsSignupModalOpen(false);
+            setIsLoginModalOpen(true);
+          }}
+          className="text-red-600 hover:text-red-700 font-semibold"
+        >
+          Login
+        </button>
+      </p>
+    </div>
+  </div>
+)}
       <footer className="bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-lg text-white py-8">
         <div className="container mx-auto px-4 text-center">
           <p>&copy; 2024 YouTube Website Generator. All rights reserved.</p>
