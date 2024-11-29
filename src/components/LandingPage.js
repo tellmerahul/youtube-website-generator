@@ -102,7 +102,7 @@ const LandingPage = () => {
         <div className="container mx-auto px-4 flex justify-between items-center">
           <div className="flex items-center">
             <Youtube className="text-red-600 mr-2" />
-            <span className="font-bold text-xl text-gray-800">WEBSITE</span>
+            <span className="font-bold text-xl text-gray-800">TRANSFORM YT</span>
           </div>
           <nav className="hidden md:flex items-center">
             <a href="#home" className="mx-2 text-gray-800 hover:text-red-600 transition-colors duration-300">Home</a>
@@ -174,6 +174,7 @@ const LandingPage = () => {
               >
                 {isLoading ? 'Generating...' : 'Generate visuals'}
               </button>
+              
             </form>
             {error && <p className="text-red-500 mt-4">{error}</p>}
           </div>
