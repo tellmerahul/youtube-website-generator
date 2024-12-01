@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Youtube, Settings, Layout, Zap, Send, Video, Palette, Globe, Menu, X, Mail, Lock, User, LogOut } from 'lucide-react';
-import { auth, signInWithGoogle, signOut } from '../firebaseConfig';
+import { auth, signInWithGoogle, signOut } from '../../firebaseConfig';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, onAuthStateChanged } from 'firebase/auth';
 import { fetchChannelData } from '../youtubeApi';
 import { generateWebsite } from '../WebsiteTemplate';
